@@ -1,0 +1,360 @@
+--- 
+title: "A Minimal Book Example"
+author: "John Doe"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib, packages.bib]
+# url: your book url like https://bookdown.org/yihui/bookdown
+# cover-image: path to the social sharing image like images/cover.jpg
+description: |
+  This is a minimal example of using the bookdown package to write a book.
+  The HTML output format for this example is bookdown::gitbook,
+  set in the _output.yml file.
+link-citations: yes
+github-repo: rstudio/bookdown-demo
+---
+
+# url: your book url like https://bookdown.org/yihui/bookdown
+
+Placeholder
+
+
+## Usage 
+## Render book
+## Preview book
+
+<!--chapter:end:index.Rmd-->
+
+# Hello bookdown 
+
+All chapters start with a first-level heading followed by your chapter title, like the line above. There should be only one first-level heading (`#`) per .Rmd file.
+
+## A section
+
+All chapter sections start with a second-level (`##`) or higher heading followed by your section title, like the sections above and below here. You can have as many as you want within a chapter.
+
+### An unnumbered section {-}
+
+Chapters and sections are numbered by default. To un-number a heading, add a `{.unnumbered}` or the shorter `{-}` at the end of the heading, like in this section.
+
+<!--chapter:end:01-intro.Rmd-->
+
+
+# Cross-references {#cross}
+
+Placeholder
+
+
+## Chapters and sub-chapters
+## Captioned figures and tables
+
+<!--chapter:end:02-cross-refs.Rmd-->
+
+# Parts
+
+You can add parts to organize one or more book chapters together. Parts can be inserted at the top of an .Rmd file, before the first-level chapter heading in that same file. 
+
+Add a numbered part: `# (PART) Act one {-}` (followed by `# A chapter`)
+
+Add an unnumbered part: `# (PART\*) Act one {-}` (followed by `# A chapter`)
+
+Add an appendix as a special kind of un-numbered part: `# (APPENDIX) Other stuff {-}` (followed by `# A chapter`). Chapters in an appendix are prepended with letters instead of numbers.
+
+
+
+
+<!--chapter:end:03-parts.Rmd-->
+
+# Footnotes and citations 
+
+## Footnotes
+
+Footnotes are put inside the square brackets after a caret `^[]`. Like this one ^[This is a footnote.]. 
+
+## Citations
+
+Reference items in your bibliography file(s) using `@key`.
+
+For example, we are using the **bookdown** package [@R-bookdown] (check out the last code chunk in index.Rmd to see how this citation key was added) in this sample book, which was built on top of R Markdown and **knitr** [@xie2015] (this citation was added manually in an external file book.bib). 
+Note that the `.bib` files need to be listed in the index.Rmd with the YAML `bibliography` key.
+
+
+The RStudio Visual Markdown Editor can also make it easier to insert citations: <https://rstudio.github.io/visual-markdown-editing/#/citations>
+
+<!--chapter:end:04-citations.Rmd-->
+
+
+# Blocks
+
+Placeholder
+
+
+## Equations
+## Theorems and proofs
+## Callout blocks
+
+<!--chapter:end:05-blocks.Rmd-->
+
+
+# Sharing your book
+
+Placeholder
+
+
+## Publishing
+## 404 pages
+## Metadata for sharing
+
+<!--chapter:end:06-share.Rmd-->
+
+`r if (knitr::is_html_output()) '
+# References {-}
+'`
+
+<!--chapter:end:07-references.Rmd-->
+
+
+
+
+<!--chapter:end:joining_notebook.Rmd-->
+
+---
+title: "Practical 1.\tLearning dplyr (and using it to calculate diversity)"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+I used the following to prepare this prac
+https://seananderson.ca/2014/09/13/dplyr-intro/
+
+
+##this loads the packages so you can use the functions they contain
+```{r}
+library(readr)
+library(dplyr)
+
+```
+
+
+
+load the data (this code will work if the data is in your working directory)
+```{r}
+load("./marena1cns.tree1.rdata")
+```
+
+Packages and data
+
+ 
+In this dataset, each row represents a single tree and each column is a variable contain information about these trees.
+These data come from vegetation plots. A vegetation plot is an area in which the plant diversity was systematically surveyed. In this dataset only trees are included and each plot may be one or more hectares in size. Each plot is divided into smaller areas called quadrats. In each quadrat, every single tree was sampled. For each tree we know its identity (i.e. its species name), its exact location and its size, among other information. The size is recorded as basal area (ba). This means the area of a cross section of the trunk of the tree at ground level. For trees that had more than one stem, the basal area is the sum of the basal area of all the stems. 
+
+The mutate() function
+The mutate function is dplyr’s way of making new variables. “ba” is the variable for the size of trees in this dataset. It is the area of a cross section of the base of each tree (the person who measured the tree would have measured the circumference and calculated area from that without cutting down the tree). Now supposing we think the square root of “ba” is more relevant than “ba” itself, this is how we calculate it in dplyr.
+###Example code 1.
+
+```{r}
+marena1cns.tree1 <- mutate (marena1cns.tree1, sqrt.ba = sqrt(ba))
+```
+
+
+
+###Task 1: 
+###A.	Modify Example code 1 to create a new variable for the log of above ground biomass (agb) in marena1cns.tree1  (this will produce some values of infinity but we will deal with that problem later).
+
+###answer 1
+```{r}
+marena1cns.tree1 <- mutate (marena1cns.tree1, sqrt.ba = log(ba))
+```
+
+
+
+Now, we are going to look at two important functions, group_by and summarise. Run Example code 2 to see what these functions do.
+###Example code 2.
+
+```{r}
+marena1cns.tree1 <- mutate (marena1cns.tree1, sqrt.ba = sqrt(ba))
+grouped.data <- group_by(marena1cns.tree1, plot, sp)
+tree.sum2 <- summarise(grouped.data, tree.count = n(), average.size = mean(sqrt.ba))
+```
+
+
+
+###Task 2: 
+###A.	Modify Example code 2 to also give the standard deviation of the size variable “sqrt.ba” for each species in each plot.
+###B.	Modify Example code 2 by removing “plot” from the first line and run it. What happens?
+###C.	Modify the code above find the number of trees in each species in the dataset (i.e. for all plots together).
+
+
+
+
+###Answer 2A.
+```{r}
+marena1cns.tree1 <- mutate (marena1cns.tree1, sqrt.ba = sqrt(ba))
+grouped.data <- group_by(marena1cns.tree1, plot, sp)
+tree.sum2 <- summarise(grouped.data, tree.count = n(), average.size = mean(sqrt.ba), sd.size = sd(ba))
+
+tree.sum2
+```
+###Answer 2C.
+```{r}
+marena1cns.tree1 <- mutate (marena1cns.tree1, sqrt.ba = sqrt(ba))
+grouped.data <- group_by(marena1cns.tree1,  sp)
+tree.sum2 <- summarise(grouped.data, tree.count = n(), average.size = mean(sqrt.ba), sd.size = sd(ba))
+tree.sum2
+```
+
+
+Now we are going to see how these tasks can be done more efficiently with the pipe operator. Run Example code 3 to see how this works.
+
+When working with the pipe function, I recommend that you check each line by inspecting the output before adding the next line
+###Example code 3.
+```{r}
+tree.sum <- marena1cns.tree1 %>%
+   mutate (sqrt.ba = sqrt(ba)) %>%
+   group_by(plot, sp) %>%
+   summarise(tree.count = n(), average.size = mean(sqrt.ba))
+tree.sum
+```
+
+###The pipe operator (%>%)
+
+###Example Code 4
+
+```{r}
+tree.sum <- marena1cns.tree1 %>%
+mutate (sqrt.ba = sqrt(ba)) %>%
+filter(ba > 0) %>%
+group_by(plot, sp) %>%
+summarise(tree.count = n(), average.size = mean(sqrt.ba))
+
+tree.sum
+```
+
+
+###The filter() function
+We use filter to choose which rows to include. Here we use a logical statement (e.g. “ba > 0”) to specify the conditions for keeping rows in the dataset. In this example we only keep rows with value of ba that are greater than zero. Here you can see how we inserted a filter step so we exclude unwanted rows from before the summary is made.
+
+###Task 3: 
+###A.	Modify example code 4 to keep all data except for rows in which the plot has the value “bci10haplot”.
+###B.	Inspect the summary dataset (tree.sum) to check if you have successfully completed part A.
+
+###Answer 3A
+```{r}
+tree.sum <- marena1cns.tree1 %>%
+mutate (sqrt.ba = sqrt(ba)) %>%
+filter(ba > 0) %>%
+group_by(plot, sp) %>%
+summarise(tree.count = n(), average.size = mean(sqrt.ba))
+tree.sum
+```
+
+
+###The arrange() function
+
+
+```{r}
+tree.sum <- marena1cns.tree1 %>%
+mutate (sqrt.ba = sqrt(ba)) %>%
+filter(ba > 0) %>%
+group_by(plot, sp) %>%
+summarise(tree.count = n(), average.size = mean(sqrt.ba))%>%
+arrange(plot, desc(tree.count))
+
+tree.sum
+```
+
+
+ 
+###Task 4: 
+###A.	Modify example code 5 so it is first ordered by plot (as it is already) and within each plot, rows are sorted from smallest size to largest size  
+
+```{r}
+tree.sum <- marena1cns.tree1 %>%
+mutate (sqrt.ba = sqrt(ba)) %>%
+filter(ba > 0) %>%
+group_by(plot, sp) %>%
+summarise(tree.count = n(), average.size = mean(sqrt.ba))%>%
+arrange(plot, average.size)
+
+tree.sum
+```
+
+ 
+###Example Code 6
+
+```{r}
+tree.sum <- marena1cns.tree1 %>%
+mutate (sqrt.ba = sqrt(ba)) %>%
+filter(ba > 0) %>%
+group_by(plot, sp) %>%
+summarise(tree.count = n(), average.size = mean(sqrt.ba))%>%
+arrange(plot, desc(tree.count)) %>%
+select (plot, sp, tree.count)
+
+tree.sum
+```
+
+
+
+
+###Challenge task
+###A.	Use what you have learned in this practical to calculate the (Inverse) Simpson diversity index for each plot 
+ 
+###challenge answer , the output contains the inversse simpson index. in the walk-through, I illogically named this beta.div when in fact, the Simpson index is for alpha diversity, so I have changed the name here. 
+```{r}
+tree.sum <- marena1cns.tree1 %>%
+  filter(ba > 0) %>%
+  mutate (ba.sqrt = sqrt(ba))  %>%
+  group_by(plot, sp) %>%
+  summarise(tree.count = n()) %>% 
+  group_by(plot)%>% 
+  mutate(proportion.in.plot = tree.count/sum(tree.count), total.trees = sum(tree.count))%>% 
+  arrange(plot, desc(tree.count))
+
+
+
+#this is a challenging task because it requires using mutate with group_by (above) to get proportion that each species makes up in each plot, and then summarising a second time (below)
+
+alpha.div <- tree.sum  %>%
+  group_by(plot) %>%
+  summarise(inverse.simpson = 1/sum(proportion.in.plot^2))
+
+alpha.div
+```
+
+
+###challenge answer more efficient code
+
+```{r}
+alpha.div <- marena1cns.tree1 %>%
+  filter(ba > 0) %>%
+  group_by(plot, sp) %>%
+  summarise(tree.count = n()) %>% 
+  mutate(proportion.in.plot = tree.count/sum(tree.count), total.trees =     sum(tree.count)) %>% 
+  arrange(plot, desc(tree.count)) %>%
+  summarise(inverse.simpson = 1/sum(proportion.in.plot^2))
+
+alpha.div
+```
+
+
+
+
+
+
+
+
+
+<!--chapter:end:Prac1_diversity.Rmd-->
+
+
+
+
+<!--chapter:end:Prac2_ggplot2.Rmd-->
+
+
+
+
+<!--chapter:end:reading_and_writing_data.Rmd-->
+

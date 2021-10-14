@@ -1,0 +1,95 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+getwd()
+
+setwd("C:/James/teaching/AIMS_Summer_School/James_Pracs/Prac1/joining_2")
+```
+
+```{r}
+library(dplyr)
+library(stringr)
+library(readr)
+library(tidyr)
+library(ggplot2)
+
+```
+```{r}
+load("./bci.tree1.rdata")
+tough <- read_csv("BCI_leaf_toughness_data.csv")
+
+```
+```{r}
+sum.bci <- bci.tree1 %>%
+  group_by (sp) %>%
+  summarise(count = n(), mean_ba = mean(ba))
+
+```
+
+
+```{r}
+tough1 <- tough %>% 
+  separate(Species, into = c("gen", "spe"), sep ="_", remove = FALSE) %>%
+  mutate(gen = substring(gen, 1, 4), gen = str_to_lower(gen, locale = 1), spe = substring (spe, 1,2)) %>%
+  unite(species_code, gen, spe, sep ="")
+
+```
+```{r}
+tough %>% 
+  separate(Species, into = c("gen", "spe"), sep ="_", remove = FALSE) %>%
+  mutate(gen = substring(gen, 1, 4), gen = str_to_lower(gen), spe = substring (spe, 1,2))
+```
+
+
+```{r}
+tough1 <- tough %>% 
+  separate(Species, into = c("gen", "spe"), sep ="_", remove = FALSE) %>%
+  mutate(gen = substring(gen, 1, 4), gen = str_to_lower(gen, locale = 1), spe = substring (spe, 1,2)) %>%
+  unite(species_code, gen, spe, sep ="")
+
+tough1 
+```
+
+```{r}
+combined <- inner_join(sum.bci, tough1, by = c("sp" = "species_code"))
+
+combined2 <- left_join(sum.bci, tough1, by = c("sp" = "species_code"))
+
+combined3 <- right_join(sum.bci, tough1, by = c("sp" = "species_code"))
+
+combined4 <- full_join(sum.bci, tough1, by = c("sp" = "species_code"), keep = TRUE)
+
+
+combined
+combined2
+```
+
+
+
+
+
+
+```{r}
+ggplot(combined, aes (x = log10(count), y = Hemicellulose)) +
+  geom_point()
+
+ggplot(combined, aes (x = log10(mean_ba), y = Hemicellulose)) +
+  geom_point()
+
+ggplot(combined, aes (x = log10(mean_ba), y = Lignin)) +
+  geom_point()
+
+
+```
+
+
+
+
+
+
+
+
+

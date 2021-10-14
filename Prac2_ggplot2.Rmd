@@ -1,0 +1,191 @@
+---
+title: "Practical 2: ggplot2"
+output: html_notebook
+---
+
+#to install gcookbook and load it
+```{r}
+library(gcookbook)
+library(dplyr)
+library(ggplot2)
+load("./doi_10.15146_mdpr-pm59__v1/marena_tree_17Jul2019/marena1cns.tree1.rdata")
+```
+
+```{r}
+ggplot(data = marena1cns.tree1, aes(x = ba, y= agb)) +
+  geom_point() 
+ 
+```
+
+
+```{r}
+plot1 <- ggplot(marena1cns.tree1, aes(x = ba, y= agb)) +
+  geom_point() 
+
+ plot1 
+
+```
+
+```{r}
+ggplot(marena1cns.tree1, aes(x = ba, y= agb)) 
+```
+
+
+```{r}
+filtered <- filter(marena1cns.tree1,plot == "p17", ba > 0, sp %in% c("brosco", "cha1te", "poular", "oxanlo"))
+
+filtered
+ 
+```
+
+
+###Example Code 2
+```{r}
+
+ ggplot(filtered, aes(x = ba, y= agb)) +
+  geom_point() 
+
+```
+
+
+
+###Example code 3
+```{r}
+ggplot(heightweight, aes(x = ageYear, y = heightIn, shape = sex, colour = sex)) +
+  geom_point()
+```
+
+
+###Task 1
+###A.	Using Example Code 3 as an example, modify example code 2  so the data from each species are represented in a different colour
+###B.	Now modify your scatter plot so that you can make a line plot instead (you can find example code in the r graphics cookbook)
+###C.	Now modify your line plot so you only plot the lower left hand corner. To do this add the example code 4 below to your existing code and modify the limits if necessary.
+
+
+###Answer 1A
+
+
+
+```{r}
+ggplot(filtered, aes(x = ba, y= agb, colour = sp)) +
+  geom_point() 
+
+```
+
+
+###Answer 1B
+```{r}
+ ggplot(filtered, aes(x = ba, y= agb, colour = sp)) +
+  geom_line() 
+```
+
+
+###Example code 4
+```{r}
+  #         +
+  #coord_cartesian(ylim = c(0, 1), xlim = c(0,1))
+
+```
+
+
+
+```{r}
+ ggplot(filtered, aes(x = ba, y= agb, colour = sp)) +
+  geom_line()  +
+  coord_cartesian(ylim = c(0, 0.1), xlim = c(0,0.03))
+```
+
+
+
+
+
+
+
+```{r}
+ce_mod <- cabbage_exp %>%
+  filter(Cultivar == "c39")
+ce_mod
+```
+ 
+ 
+
+###Example Code 5 
+```{r}
+
+ggplot(ce_mod, aes(x = Date, y = Weight)) +
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin = Weight - se, ymax = Weight + se), width = .2)
+ 
+```
+ 
+###Task 2
+###A.	Using what you learned in prac 1, summarise the filtered datset to produce a summary dataset with new variables for mean of agb and standard deviation of agb. This is a revision exercise. If you want to skip this or if you get stuck, there is code at the end of this practical you can use
+###B.	Using example code 4 and the explanation above, make an error bar chart for your new summary data
+
+
+#The need to summarise their data (I have supplied this code at the end of the pra instructions)
+```{r}
+filtered.sum <- filtered %>%
+group_by(sp) %>%
+summarise(ave.mass = mean(agb), sd = sd(agb))
+
+```
+
+###Answer 2B
+```{r}
+ggplot(filtered.sum, aes(x = sp, y = ave.mass)) +
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin = ave.mass - sd, ymax = ave.mass + sd), width = .2)
+
+```
+
+
+
+###Task 3
+###A.	Using the example here, add some more descriptive axis labels to the x and y axes of the plot from task 2B 
+###B.	Find instructions in the r graphics cookbook and add a title to your plot
+###C.	Read this section of the cookbook and change the angles of the text on the x-axis
+###D.	Find instructions in the r graphics cookbook and reverse the order of the species on the x-axis
+
+
+###Answer 3A
+```{r}
+ggplot(filtered.sum, aes(x = sp, y = ave.mass)) +
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin = ave.mass - sd, ymax = ave.mass + sd), width = .2) +
+  xlab("Species") +
+  ylab("Average Above Ground Biomass")
+  
+```
+
+###Answer 3B
+###https://r-graphics.org/recipe-appearance-title
+```{r}
+ggplot(filtered.sum, aes(x = sp, y = ave.mass)) +
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin = ave.mass - sd, ymax = ave.mass + sd), width = .2)+
+  ggtitle("Biomass of selected tree species from Panama")
+```
+###Answer 3C
+```{r}
+ggplot(filtered.sum, aes(x = sp, y = ave.mass)) +
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin = ave.mass - sd, ymax = ave.mass + sd), width = .2) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1, vjust = 1))
+```
+
+
+###Answer 3D
+###https://r-graphics.org/recipe-axis-order
+```{r}
+ggplot(filtered.sum, aes(x = sp, y = ave.mass)) +
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin = ave.mass - sd, ymax = ave.mass + sd), width = .2) +
+  scale_x_discrete(limits = c("poular", "oxanlo", "cha1te", "brosco"))
+```
+
+
+
+
+
+

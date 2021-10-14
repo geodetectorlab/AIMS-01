@@ -1,0 +1,74 @@
+---
+title: "Prac 4: Merge()"
+output: html_notebook
+---
+
+```{r}
+library(readr)
+
+```
+
+
+```{r}
+#this loads a datafile in r file format
+load("./marena1cns.tree1.rdata")
+getwd()
+
+#this is the base r (non-dplyr) way to read a csv file...
+t1 <- read.csv("C:/James/teaching/AIMS_Summer_School/James_Pracs/Prac1/BCI_leaf_toughness_data.csv", header = TRUE)
+
+#this is dplyr way to read a csv file...
+t2<- read_csv("./BCI_leaf_toughness_data.csv")
+
+#unless you have commas as decimals and semicolons to separate columns, in which case use the following (see also below)
+#read.csv2
+#read_csv2
+
+
+#This is from base r and it writes a tab delimited text file. We are doing this to practice reading such a file as it is a common file type.
+write.table(t1, file = "C:/James/teaching/AIMS_Summer_School/James_Pracs/Prac1/new_toughness.txt")
+#read_table
+
+#This is the-dplyr way to write a csv file with points for decimals and commas for separators
+
+write_csv(t1, file = "new_toughness.csv")
+#read_table
+
+#this is the non-dplyr way to write a csv file with points for decimals and commas for separators
+
+
+write.csv(t1, file = "C:/James/teaching/AIMS_Summer_School/James_Pracs/Prac1/new_toughness.csv")
+#read_table
+
+#this is the non-dplyr way to write a csv file with commas for decimals and semicolons for separators. 
+write.csv2(t1, file = "C:/James/teaching/AIMS_Summer_School/James_Pracs/Prac1/new_toughness_other.csv")
+
+#This is the-dplyr way to write a csv file with commas for decimals and semicolons for separators. 
+
+write_csv2(t1, file = "new_toughness.csv")
+
+#this is the non-dplyr way to read a tab-delimited text file
+t3 <- read.table("C:/James/teaching/AIMS_Summer_School/James_Pracs/Prac1/new_toughness.txt")
+
+#this is one of two non-dplyr ways to read a tab-delimited text file
+t4 <-read_table2("./new_toughness.txt")
+
+
+#This is another dplyr way to read a tab-delimited text file. In this case it doesn't work well.
+t5 <-read_table("./new_toughness.txt")
+#"read_table2() is like read.table(), it allows any number of whitespace characters between columns, and the lines can be of different lengths. read_table() is more strict, each line must be the same length, and each field is in the same position in every line. It first finds empty columns and then parses like a fixed width file."
+
+spec_table("new_toughness.txt")
+
+spec_table2("new_toughness.txt")
+
+t6<- read_csv2("./new_toughness_other.csv")
+
+t7<- read.csv2("C:/James/teaching/AIMS_Summer_School/James_Pracs/Prac1/new_toughness_other.csv")
+
+spec_csv("./new_toughness_other.csv")
+
+spec_csv2("./new_toughness_other.csv")
+
+```
+
